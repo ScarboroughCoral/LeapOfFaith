@@ -1,4 +1,5 @@
 #pragma once
+#define PI 3.141592653589
 #define BG_WIDTH 330
 #define BG_HEIGHT 600
 //ǽ

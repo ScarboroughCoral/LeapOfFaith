@@ -8,8 +8,9 @@ class Block:public Cube
 public:
 	int width;
 	int  height;
+	int num;
 public:
-	Block(CBitmap *,int x,int y,int w,int h);
+	Block(CBitmap *,int x,int y,int num,int w,int h);
 	~Block();
 
 private:
@@ -17,14 +18,16 @@ private:
 };
 
 
-inline Block::Block(CBitmap *bmp, int x, int y, int w, int h=BLOCK_HEIGHT):Cube(bmp)
+inline Block::Block(CBitmap *bmp, int x, int y, int num,int w = BLOCK_WIDTH, int h=BLOCK_HEIGHT):Cube(bmp)
 {
 	this->x = x;
 	this->y = y;
+	this->num = num;
 	this->width = w;
 	this->height = h;
 }
 
-Block::~Block()
+inline Block::~Block()
 {
 }
+

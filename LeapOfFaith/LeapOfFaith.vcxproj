@@ -119,10 +119,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BitmapRotate.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="LeapApp.h" />
     <ClInclude Include="LeapWnd.h" />
+    <ClInclude Include="Block.h" />
     <ClInclude Include="Wall.h" />
   </ItemGroup>
   <ItemGroup>

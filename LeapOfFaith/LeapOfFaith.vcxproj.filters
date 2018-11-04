@@ -30,6 +30,12 @@
     <ClInclude Include="Wall.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapRotate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LeapWnd.cpp">
