@@ -28,6 +28,12 @@ LeapWnd::LeapWnd()
 	{
 		rwalls[i] = new Wall(wallbmp, WALL_WIDTH+BG_WIDTH, i*WALL_HEIGHT);
 	}
+	//初始化障碍物
+	blockbmp = new CBitmap;
+	blockbmp->m_hObject = LoadImage(NULL, "block.bmp", IMAGE_BITMAP, BLOCK_WIDTH, BLOCK_HEIGHT, LR_LOADFROMFILE);
+	//初始化指针
+	pointbmp = new CBitmap;
+	pointbmp->m_hObject = LoadImage(NULL, "arrowa.bmp", IMAGE_BITMAP, POINTER_WIDTH, POINTER_HEIGHT, LR_LOADFROMFILE);
 	//初始化小人
 	char name[10];
 	for (size_t i = 0; i < MAN_NUM; i++)
@@ -39,8 +45,9 @@ LeapWnd::LeapWnd()
 		man[i][1] = new CBitmap;
 		man[i][1]->m_hObject = LoadImage(NULL, name, IMAGE_BITMAP, MAN_WIDTH, MAN_HEIGHT, LR_LOADFROMFILE);
 	}
-
+	//开启计时器
 	SetTimer(NULL, 100, NULL);
+	
 }
 
 LeapWnd::~LeapWnd()
@@ -54,7 +61,7 @@ END_MESSAGE_MAP()
 
 void LeapWnd::ShowStage()
 {
-	CClientDC dc(this); 
+		CClientDC dc(this); 
 		//画背景
 		pdc->SelectObject(bg);
 		dc.BitBlt(WALL_WIDTH, bg_y, BG_WIDTH, BG_HEIGHT, pdc, 0, 0, SRCCOPY);
@@ -66,6 +73,12 @@ void LeapWnd::ShowStage()
 			dc.BitBlt(lwalls[i]->x, lwalls[i]->y, WALL_WIDTH, WALL_HEIGHT, pdc, 0, 0, SRCCOPY);
 			dc.BitBlt(rwalls[i]->x, rwalls[i]->y, WALL_WIDTH, WALL_HEIGHT, pdc, 0, 0, SRCCOPY);
 		}
+		//画指针
+		if (is_pointer_show)
+		{
+			pdc->SelectObject(pointbmp);
+			dc.BitBlt(POINTER_XOFFSET, POINTER_YOFFSET, POINTER_WIDTH, POINTER_HEIGHT, pdc, 0, 0, SRCAND);
+		}
 		//画小人
 		pdc->SelectObject(man[man_frame][1]);
 		dc.BitBlt(MAN_XOFFSET, man_y, MAN_WIDTH, MAN_HEIGHT, pdc, 0, 0, SRCAND);
@@ -73,18 +86,78 @@ void LeapWnd::ShowStage()
 		dc.BitBlt(MAN_XOFFSET, man_y, MAN_WIDTH, MAN_HEIGHT, pdc, 0, 0, SRCPAINT);
 }
 
+/*
+* 清除障碍物辅助缓存
+*/
+void LeapWnd::Release_block_bk_cache()
+{
+	for (size_t i = 0; i < BLOCK_CACHE_SIZE; i++)
+	{
+		if (stage_blocks_back[i]!=NULL)
+		{
+			delete stage_blocks_back[i];
+			stage_blocks_back[i] = NULL;
+		}
+	}
+}
+/*
+* 清除障碍物主缓存
+*/
+void LeapWnd::Release_block_cache()
+{
+	for (size_t i = 0; i < BLOCK_CACHE_SIZE; i++)
+	{
+		if (stage_blocks[i] != NULL)
+		{
+			delete stage_blocks[i];
+			stage_blocks[i] = NULL;
+		}
+	}
+}
+
+void LeapWnd::Reload_block_bk_cache()
+{
+	for (size_t i = 0; i < BLOCK_CACHE_SIZE; i++)
+	{
+		if (stage_blocks_back[i] == NULL)
+		{
+			
+		}
+	}
+}
+
+void LeapWnd::Reload_block_cache()
+{
+	for (size_t i = 0; i < BLOCK_CACHE_SIZE; i++)
+	{
+		if (stage_blocks[i] == NULL)
+		{
+			
+		}
+	}
+}
+
 void LeapWnd::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
+	//画背景
 	pdc->SelectObject(bg);
 	dc.BitBlt(WALL_WIDTH, bg_y, BG_WIDTH, BG_HEIGHT, pdc, 0, 0, SRCCOPY);
 	dc.BitBlt(WALL_WIDTH, bgback_y, BG_WIDTH, BG_HEIGHT, pdc, 0, 0, SRCCOPY);
+	//画墙
 	pdc->SelectObject(wallbmp);
 	for (size_t i = 0; i < WALL_NUM; i++)
 	{
 		dc.BitBlt(lwalls[i]->x, lwalls[i]->y, WALL_WIDTH, WALL_HEIGHT, pdc, 0, 0, SRCCOPY);
 		dc.BitBlt(rwalls[i]->x, rwalls[i]->y, WALL_WIDTH, WALL_HEIGHT, pdc, 0, 0, SRCCOPY);
 	}
+	//画指针
+	if (is_pointer_show)
+	{
+		pdc->SelectObject(pointbmp);
+		dc.BitBlt(POINTER_XOFFSET, POINTER_YOFFSET, POINTER_WIDTH, POINTER_HEIGHT, pdc, 0, 0, SRCAND);
+	}
+	//画人
 	pdc->SelectObject(man[0][1]);
 	dc.BitBlt(MAN_XOFFSET, MAN_YOFFSET, MAN_WIDTH, MAN_HEIGHT, pdc, 0, 0, SRCAND);
 	pdc->SelectObject(man[0][0]);
@@ -142,5 +215,6 @@ void LeapWnd::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	is_man_move = true;
+	is_pointer_show = false;
 	CFrameWnd::OnKeyUp(nChar, nRepCnt, nFlags);
 }
