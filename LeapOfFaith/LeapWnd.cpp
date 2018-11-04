@@ -121,7 +121,7 @@ void LeapWnd::Reload_block_bk_cache()
 	{
 		if (stage_blocks_back[i] == NULL)
 		{
-			
+			 
 		}
 	}
 }
