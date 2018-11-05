@@ -4,7 +4,7 @@
 #include "Block.h"
 #include "Constant.h"
 
-#define BLOCK_CACHE_SIZE 10
+#define BLOCK_CACHE_SIZE 5
 
 class LeapWnd :public CFrameWnd
 {
@@ -16,8 +16,8 @@ private:
 	CDC * pdc;
 	//背景相关
 	CBitmap * bg;
-	int bg_y = 0;
-	int bgback_y = -BG_HEIGHT;
+	float bg_y = 0;
+	float bgback_y = -BG_HEIGHT;
 	bool is_bg_move = false;
 	CBitmap * blockbmp;
 	//指针
@@ -25,14 +25,14 @@ private:
 	CBitmap * pointtmpbmp;
 	bool is_pointer_show = true;
 	float angle = 0;
-	int deltaY = 10;
-	int deltaX = 0;
+	float deltaY = 1;
+	float deltaX = 0;
 	bool is_signed = false;
 	//角色相关
 	CBitmap * man[MAN_NUM][2];
 	int man_frame = 0;
-	int man_y = MAN_YOFFSET;
-	int man_x = MAN_XOFFSET;
+	float man_y = MAN_YOFFSET;
+	float man_x = MAN_XOFFSET;
 	bool is_man_move = false;
 	//墙
 	CBitmap * wallbmp;

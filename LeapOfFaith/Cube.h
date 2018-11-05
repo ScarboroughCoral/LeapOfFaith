@@ -7,8 +7,8 @@ public:
 	Cube();
 	~Cube();
 public:
-	int x;
-	int y;
+	float x;
+	float y;
 protected:
 	CBitmap * bmp;
 

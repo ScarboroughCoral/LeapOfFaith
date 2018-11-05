@@ -5,14 +5,14 @@
 class Wall:public Cube
 {
 public:
-	Wall(CBitmap *, int x, int y);
+	Wall(CBitmap *, float x, float y);
 	~Wall();
 
 private:
 
 };
 
-Wall::Wall(CBitmap *bmp,int x,int y):Cube(bmp)
+Wall::Wall(CBitmap *bmp, float x, float y):Cube(bmp)
 {
 	this->x = x;
 	this->y = y;

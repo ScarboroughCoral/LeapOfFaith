@@ -4,6 +4,7 @@
 #include "LeapWnd.h"
 #include "Wall.h"
 #include "BitmapRotate.h"
+#include "IsIn.h"
 
 #define LEVEL 2
 
@@ -53,7 +54,7 @@ LeapWnd::LeapWnd()
 		man[i][1]->m_hObject = LoadImage(NULL, name, IMAGE_BITMAP, MAN_WIDTH, MAN_HEIGHT, LR_LOADFROMFILE);
 	}
 	//开启计时器
-	timer = SetTimer(1, 100, NULL);
+	timer = SetTimer(1, 10, NULL);
 	
 }
 
@@ -312,6 +313,25 @@ void LeapWnd::OnTimer(UINT_PTR nIDEvent)
 	}
 	if (is_man_move)
 	{
+		//时间控制
+		elapsed_time++;
+		switch (elapsed_time%100)
+		{
+		case 0:
+			man_frame = 0;
+			break;
+		case 25:
+			man_frame = 1;
+			break;
+		case 50:
+			man_frame = 2;
+			break;
+		case 75:
+			man_frame = 3;
+			break;
+		default:
+			break;
+		}
 		if (man_y>MAN_CENTER)
 		{
 			man_y -= deltaY;
@@ -332,22 +352,108 @@ void LeapWnd::OnTimer(UINT_PTR nIDEvent)
 
 		
 		score += deltaY;
-		man_frame = (man_frame + 1) % MAN_NUM;
-
+		//man_frame = (man_frame + 1) % MAN_NUM;
+		bool breakFlag = false;
 		//碰撞检测
 		for (size_t i = 0; i < BLOCK_CACHE_SIZE; i++)
 		{
 			Block * current = stage_blocks[i][0];
 			for (size_t i = 0; i < current->num; i++)
 			{
-				if (man_x >= current->x&&man_x <= (current->x + current->num*current->width) && man_y >= current->y&&man_y <= (current->y + current->height))
+				if (IsBetween(current->y,current->y+current->height,man_y,man_y+MAN_HEIGHT) &&current->x + current->num*current->width - man_x >= 0 && current->x + current->num*current->width - man_x <= 5)
 				{
+					man_x = current->x + current->num*current->width;
 					deltaX = -deltaX;
+					breakFlag = true;
+					break;
+				}
+				else if (IsBetween(current->x,current->x+current->num*current->width,man_x,man_x+MAN_WIDTH)&&current->y+current->height-man_y>=0&& current->y + current->height - man_y <=1)
+				{
+					man_y = current->y + current->height; 
+					deltaY = -deltaY;
+					breakFlag = true;
+					break;
 				}
 			}
+			if (breakFlag)
+			{
+				break;
+				breakFlag = false;
+			}
 			current = stage_blocks[i][1];
+			for (size_t i = 0; i < current->num; i++)
+			{
+				if (IsBetween(current->y, current->y + current->height, man_y, man_y + MAN_HEIGHT) && (current->x - (current->num-1)*current->width - man_x-MAN_WIDTH )<= 0 && (current->x - (current->num - 1)*current->width - man_x - MAN_WIDTH)>= -5)
+				{
+					man_x = current->x - (current->num-1)*current->width-MAN_WIDTH;
+					deltaX = -deltaX;
+					breakFlag = true;
+					break;
+				}
+				else if (IsBetween(current->x - (current->num-1)*current->width, current->x + current->width, man_x, man_x + MAN_WIDTH) && current->y + current->height - man_y >= 0 && current->y + current->height - man_y <= 1)
+				{
+					man_y = current->y + current->height;
+					deltaY = -deltaY;
+					breakFlag = true;
+					break;
+				}
+			}
+			if (breakFlag)
+			{
+				break;
+				breakFlag = false;
+			}
+			
 			current = stage_blocks_back[i][0];
+			for (size_t i = 0; i < current->num; i++)
+			{
+				for (size_t i = 0; i < current->num; i++)
+				{
+					if (IsBetween(current->y, current->y + current->height, man_y, man_y + MAN_HEIGHT) && current->x + current->num*current->width - man_x >= 0 && current->x + current->num*current->width - man_x <= 5)
+					{
+						man_x = current->x + current->num*current->width;
+						deltaX = -deltaX;
+						breakFlag = true;
+						break;
+					}
+					else if (IsBetween(current->x, current->x + current->num*current->width, man_x, man_x + MAN_WIDTH) && current->y + current->height - man_y >= 0 && current->y + current->height - man_y <= 1)
+					{
+						man_y = current->y + current->height;
+						deltaY = -deltaY;
+						breakFlag = true;
+						break;
+					}
+				}
+			}
+			if (breakFlag)
+			{
+				break;
+				breakFlag = false;
+			}
 			current = stage_blocks_back[i][1];
+
+			for (size_t i = 0; i < current->num; i++)
+			{
+				if (IsBetween(current->y, current->y + current->height, man_y, man_y + MAN_HEIGHT) && (current->x - (current->num - 1)*current->width - man_x - MAN_WIDTH)<= 0 && (current->x - (current->num - 1)*current->width - man_x - MAN_WIDTH)>= -5)
+				{
+					man_x = current->x - (current->num - 1)*current->width - MAN_WIDTH;
+					deltaX = -deltaX;
+					breakFlag = true;
+					break;
+				}
+				else if (IsBetween(current->x - (current->num - 1)*current->width, current->x + current->width, man_x, man_x + MAN_WIDTH) && current->y + current->height - man_y >= 0 && current->y + current->height - man_y <= 1)
+				{
+					man_y = current->y + current->height;
+					deltaY = -deltaY;
+					breakFlag = true;
+					break;
+				}
+			}
+			if (breakFlag)
+			{
+				break;
+				breakFlag = false;
+			}
 		}
 		//碰墙
 		if (man_x <= WALL_WIDTH || (man_x + MAN_WIDTH) >= (WALL_WIDTH + BG_WIDTH))
@@ -359,12 +465,12 @@ void LeapWnd::OnTimer(UINT_PTR nIDEvent)
 		CBitmap * tmp= pointtmpbmp;
 		if (!is_signed)
 		{
-			angle += 10;
+			angle += 1;
 			pointtmpbmp = BmpRotate(pointbmp, angle);
 		}
 		else
 		{
-			angle -= 10;
+			angle -= 1;
 			pointtmpbmp = BmpRotate(pointbmp, angle);
 		}
 		if (angle==90)
@@ -383,9 +489,7 @@ void LeapWnd::OnTimer(UINT_PTR nIDEvent)
 
 	}
 	ShowStage();
-	//时间控制
-	elapsed_time++;
-	if (elapsed_time>=300||deltaY<0)
+	if (elapsed_time>=3000||deltaY<0)
 	{
 		is_gameover = true;
 	}
@@ -415,7 +519,7 @@ void LeapWnd::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	if (angle == 90|| angle == -90)
 	{
 		deltaY = 0;
-		deltaX = 10;
+		deltaX = angle/18;
 	}
 	else if (angle==0)
 	{
@@ -423,6 +527,14 @@ void LeapWnd::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	else {
 		deltaX = -tan(angle*PI / 180)*deltaY;
+		if (deltaX > 5)
+		{
+			deltaX = 5;
+		}
+		if (deltaX < -5)
+		{
+			deltaX = -5;
+		}
 	}
 	CFrameWnd::OnKeyUp(nChar, nRepCnt, nFlags);
 }
